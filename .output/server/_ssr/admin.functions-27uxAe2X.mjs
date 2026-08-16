@@ -1,0 +1,301 @@
+import { r as slugify, t as fetchUserRole } from "./admin-Bv8g1X24.mjs";
+import { a as requireSupabaseAuth } from "./auth-middleware-BoaO0enN.mjs";
+import { c as createServerFn } from "./createServerFn-CIHAFgYl.mjs";
+import { l as stringType, n as booleanType, o as numberType, r as enumType, s as objectType } from "../_libs/zod.mjs";
+import { t as createServerRpc } from "./createServerRpc-B90ckaqP.mjs";
+import processModule from "node:process";
+import { Buffer } from "node:buffer";
+//#region node_modules/.nitro/vite/services/ssr/assets/admin.functions-27uxAe2X.js
+async function assertAdmin(context) {
+	if (await fetchUserRole(context.userId, context.supabase) !== "admin") {
+		const { forbidden } = await import("./auth-middleware-BoaO0enN.mjs").then((n) => n.t).then((n) => n.a);
+		throw forbidden("Accès réservé aux administrateurs.");
+	}
+}
+async function writer(userClient) {
+	if (processModule.env.SUPABASE_SERVICE_ROLE_KEY && processModule.env.SUPABASE_URL) {
+		const { supabaseAdmin } = await import("./client.server-Bw6iWMJ-.mjs");
+		return supabaseAdmin;
+	}
+	return userClient;
+}
+var getAdminStats_createServerFn_handler = createServerRpc({
+	id: "4fec70c92c2624b017310f557d52373f6e45b4f5283a3272a864213d4d65e68d",
+	name: "getAdminStats",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => getAdminStats.__executeServer(opts));
+var getAdminStats = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(getAdminStats_createServerFn_handler, async ({ context }) => {
+	await assertAdmin(context);
+	const db = await writer(context.supabase);
+	const [ebooks, chapters, library, profiles] = await Promise.all([
+		db.from("ebooks").select("id", {
+			count: "exact",
+			head: true
+		}),
+		db.from("chapters").select("id", {
+			count: "exact",
+			head: true
+		}),
+		db.from("library_entries").select("id", {
+			count: "exact",
+			head: true
+		}),
+		db.from("profiles").select("id", {
+			count: "exact",
+			head: true
+		})
+	]);
+	const failed = [
+		ebooks,
+		chapters,
+		library,
+		profiles
+	].find((result) => result.error);
+	if (failed?.error) throw new Error(failed.error.message);
+	return {
+		ebooks: ebooks.count ?? 0,
+		chapters: chapters.count ?? 0,
+		lecteurs: profiles.count ?? 0,
+		bibliotheque: library.count ?? 0
+	};
+});
+var adminListEbooks_createServerFn_handler = createServerRpc({
+	id: "1228b86c52c7ddb466a7a79757e5609b9a5cd0e04ac59cb1b7cc5f51c9e62458",
+	name: "adminListEbooks",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminListEbooks.__executeServer(opts));
+var adminListEbooks = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(adminListEbooks_createServerFn_handler, async ({ context }) => {
+	await assertAdmin(context);
+	const { data, error } = await (await writer(context.supabase)).from("ebooks").select("id, slug, title, subtitle, category, categorie_eb_id, price_label, prix, pages, published, position, cover_key, fichier_url, reading_minutes, description").order("position", { ascending: true });
+	if (error) throw new Error(error.message);
+	return data ?? [];
+});
+var ebookInput = objectType({
+	id: stringType().uuid().optional(),
+	title: stringType().min(2).max(180),
+	slug: stringType().max(120).optional(),
+	subtitle: stringType().max(240).optional().nullable(),
+	description: stringType().max(8e3).optional().default(""),
+	category: stringType().max(80).optional().nullable(),
+	category_id: stringType().uuid().optional().nullable(),
+	cover_key: stringType().max(80).optional().nullable(),
+	fichier_url: stringType().max(500).optional().nullable().refine((value) => !value || !/^https?:\/\//i.test(value) && !value.includes(".."), { message: "Le PDF doit être un chemin Storage privé." }),
+	price_label: stringType().max(40).optional().default("4 500 FCFA"),
+	price_amount: numberType().min(0).max(1e8).optional().default(4500),
+	pages: numberType().int().min(1).max(2e3).optional().default(80),
+	reading_minutes: numberType().int().min(1).max(5e3).optional().default(90),
+	position: numberType().int().min(0).max(999).optional().default(0),
+	published: booleanType().optional().default(false)
+});
+var adminSaveEbook_createServerFn_handler = createServerRpc({
+	id: "778d165b8444fdcd064f531e8b4039249dc9df76a51964c74d0f8ff157b8e6cc",
+	name: "adminSaveEbook",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminSaveEbook.__executeServer(opts));
+var adminSaveEbook = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => ebookInput.parse(data)).handler(adminSaveEbook_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const db = await writer(context.supabase);
+	const slug = (data.slug?.trim() || slugify(data.title) || `livre-${Date.now()}`).slice(0, 120);
+	const title = data.title.trim();
+	const priceAmount = data.price_amount ?? 4500;
+	const published = data.published ?? false;
+	const fichierUrl = data.fichier_url?.trim() || null;
+	if (fichierUrl && /^https?:\/\//i.test(fichierUrl)) throw new Error("Le PDF doit être un chemin Storage privé (pdfs/...), pas une URL HTTP.");
+	if (fichierUrl && (fichierUrl.includes("..") || fichierUrl.startsWith("/"))) throw new Error("Chemin PDF invalide.");
+	const payload = {
+		title,
+		titre: title,
+		slug,
+		subtitle: data.subtitle?.trim() || null,
+		description: data.description ?? "",
+		category: data.category?.trim() || null,
+		categorie_eb_id: data.category_id || null,
+		cover_key: data.cover_key?.trim() || null,
+		image_url: data.cover_key?.trim() || null,
+		fichier_url: fichierUrl,
+		price_label: data.price_label || "4 500 FCFA",
+		prix: priceAmount,
+		pages: data.pages ?? 80,
+		reading_minutes: data.reading_minutes ?? 90,
+		position: data.position ?? 0,
+		published,
+		statut: published ? "publie" : "brouillon"
+	};
+	if (data.id) {
+		const { error } = await db.from("ebooks").update(payload).eq("id", data.id).select("id").single();
+		if (error) throw new Error(error.message);
+		return {
+			id: data.id,
+			slug
+		};
+	}
+	const { data: created, error } = await db.from("ebooks").insert(payload).select("id, slug").single();
+	if (error) throw new Error(error.message);
+	return created;
+});
+var adminDeleteEbook_createServerFn_handler = createServerRpc({
+	id: "ec94ca86f48e05851912f26742e6b5fc8963374b9e8c98e883eabd0988ae3f17",
+	name: "adminDeleteEbook",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminDeleteEbook.__executeServer(opts));
+var adminDeleteEbook = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({ id: stringType().uuid() }).parse(data)).handler(adminDeleteEbook_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const db = await writer(context.supabase);
+	const { data: ebook } = await db.from("ebooks").select("fichier_url").eq("id", data.id).maybeSingle();
+	const { error } = await db.from("ebooks").delete().eq("id", data.id).select("id").single();
+	if (error) throw new Error(error.message);
+	if (ebook?.fichier_url && !/^https?:\/\//i.test(ebook.fichier_url)) {
+		const { error: storageError } = await db.storage.from("ebooks").remove([ebook.fichier_url]);
+		if (storageError) console.warn("[admin] PDF orphelin après suppression:", storageError.message);
+	}
+	return { ok: true };
+});
+var adminListChapters_createServerFn_handler = createServerRpc({
+	id: "225b59bc2aecbf1437ce37287604c696595e6c76779b9b39de5287c00a83ffd1",
+	name: "adminListChapters",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminListChapters.__executeServer(opts));
+var adminListChapters = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).validator((data) => objectType({ ebookId: stringType().uuid() }).parse(data)).handler(adminListChapters_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const { data: rows, error } = await (await writer(context.supabase)).from("chapters").select("id, ebook_id, title, position, is_preview, content").eq("ebook_id", data.ebookId).order("position", { ascending: true });
+	if (error) throw new Error(error.message);
+	return rows ?? [];
+});
+var chapterInput = objectType({
+	id: stringType().uuid().optional(),
+	ebook_id: stringType().uuid(),
+	title: stringType().min(2).max(200),
+	position: numberType().int().min(1).max(500),
+	is_preview: booleanType().optional().default(false),
+	content: stringType().max(2e5).optional().default("")
+});
+var adminSaveChapter_createServerFn_handler = createServerRpc({
+	id: "50c00dc0d06465e7e7bba5124133276d72b028ac4d41a9f1e044cf926e3f4376",
+	name: "adminSaveChapter",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminSaveChapter.__executeServer(opts));
+var adminSaveChapter = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => chapterInput.parse(data)).handler(adminSaveChapter_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const db = await writer(context.supabase);
+	const { data: conflict, error: conflictError } = await db.from("chapters").select("id").eq("ebook_id", data.ebook_id).eq("position", data.position).neq("id", data.id ?? "00000000-0000-0000-0000-000000000000").maybeSingle();
+	if (conflictError) throw new Error(conflictError.message);
+	if (conflict) throw new Error(`La position ${data.position} est déjà utilisée pour cet ebook.`);
+	const payload = {
+		ebook_id: data.ebook_id,
+		title: data.title.trim(),
+		position: data.position,
+		is_preview: data.is_preview ?? false,
+		content: data.content ?? ""
+	};
+	if (data.id) {
+		const { error } = await db.from("chapters").update(payload).eq("id", data.id).select("id").single();
+		if (error) throw new Error(error.message);
+		return { id: data.id };
+	}
+	const { data: created, error } = await db.from("chapters").insert(payload).select("id").single();
+	if (error) throw new Error(error.message);
+	return created;
+});
+var adminDeleteChapter_createServerFn_handler = createServerRpc({
+	id: "22696331aeaef913c54b108dac606e0e0c3ac83c60830ca664ab4ebe013f05ff",
+	name: "adminDeleteChapter",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminDeleteChapter.__executeServer(opts));
+var adminDeleteChapter = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({ id: stringType().uuid() }).parse(data)).handler(adminDeleteChapter_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const { error } = await (await writer(context.supabase)).from("chapters").delete().eq("id", data.id).select("id").single();
+	if (error) throw new Error(error.message);
+	return { ok: true };
+});
+var adminListReaders_createServerFn_handler = createServerRpc({
+	id: "220d8858e112739a8c538c5d63644cc8220e64eb8e4ef787aacf6f8a987bc7ce",
+	name: "adminListReaders",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminListReaders.__executeServer(opts));
+var adminListReaders = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(adminListReaders_createServerFn_handler, async ({ context }) => {
+	await assertAdmin(context);
+	const db = await writer(context.supabase);
+	const { data: profiles, error } = await db.from("profiles").select("id, display_name, email, role, created_at").order("created_at", { ascending: false });
+	if (error) throw new Error(error.message);
+	const { data: entries } = await db.from("library_entries").select("user_id");
+	const counts = (entries ?? []).reduce((acc, row) => {
+		acc[row.user_id] = (acc[row.user_id] ?? 0) + 1;
+		return acc;
+	}, {});
+	return (profiles ?? []).map((profile) => ({
+		...profile,
+		livres: counts[profile.id] ?? 0
+	}));
+});
+var adminSetRole_createServerFn_handler = createServerRpc({
+	id: "154da85bc7e5915df5164155bbb68a97441082079312d44aab513dabc82f59c3",
+	name: "adminSetRole",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminSetRole.__executeServer(opts));
+var adminSetRole = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({
+	userId: stringType().uuid(),
+	role: enumType(["admin", "client"])
+}).parse(data)).handler(adminSetRole_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	if (data.userId === context.userId && data.role !== "admin") throw new Error("Vous ne pouvez pas retirer votre propre rôle admin.");
+	const db = await writer(context.supabase);
+	const { error } = await db.from("profiles").update({ role: data.role }).eq("id", data.userId).select("id").single();
+	if (error) throw new Error(error.message);
+	await db.from("users").update({ role: data.role }).eq("id", data.userId);
+	return { ok: true };
+});
+var adminGrantEbookAccess_createServerFn_handler = createServerRpc({
+	id: "eb926b593a423c338e07f0c2113a5a22a029df6ebf8362e7f79e9b69d6af4b6f",
+	name: "adminGrantEbookAccess",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminGrantEbookAccess.__executeServer(opts));
+var adminGrantEbookAccess = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({
+	userId: stringType().uuid(),
+	ebookId: stringType().uuid()
+}).parse(data)).handler(adminGrantEbookAccess_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const { error } = await (await writer(context.supabase)).from("library_entries").upsert({
+		user_id: data.userId,
+		ebook_id: data.ebookId
+	}, { onConflict: "user_id,ebook_id" });
+	if (error) throw new Error(error.message);
+	return { ok: true };
+});
+var adminRevokeEbookAccess_createServerFn_handler = createServerRpc({
+	id: "d382d5d6f6d3feb0f2e6a698afee2948bfba3953d643ccead481714e06b09eef",
+	name: "adminRevokeEbookAccess",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminRevokeEbookAccess.__executeServer(opts));
+var adminRevokeEbookAccess = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({
+	userId: stringType().uuid(),
+	ebookId: stringType().uuid()
+}).parse(data)).handler(adminRevokeEbookAccess_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const { error } = await (await writer(context.supabase)).from("library_entries").delete().eq("user_id", data.userId).eq("ebook_id", data.ebookId).select("id").single();
+	if (error) throw new Error(error.message);
+	return { ok: true };
+});
+var adminUploadEbookPdf_createServerFn_handler = createServerRpc({
+	id: "9ac09a081b26143213bedb025de3dbea793a3f4dd263fd595eb080cece2ca914",
+	name: "adminUploadEbookPdf",
+	filename: "src/lib/admin.functions.ts"
+}, (opts) => adminUploadEbookPdf.__executeServer(opts));
+var adminUploadEbookPdf = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).validator((data) => objectType({
+	fileName: stringType().min(1).max(180),
+	base64: stringType().min(20).max(7e7),
+	slugHint: stringType().max(120).optional()
+}).parse(data)).handler(adminUploadEbookPdf_createServerFn_handler, async ({ data, context }) => {
+	await assertAdmin(context);
+	const raw = Buffer.from(data.base64, "base64");
+	if (raw.byteLength > 52428800) throw new Error("Le PDF ne doit pas dépasser 50 Mo.");
+	if (raw.subarray(0, 5).toString("utf8") !== "%PDF-") throw new Error("Le fichier n'est pas un PDF valide.");
+	const path = `pdfs/${slugify(data.slugHint || data.fileName.replace(/\.pdf$/i, "")) || "ebook"}-${crypto.randomUUID()}.pdf`;
+	const { error } = await (await writer(context.supabase)).storage.from("ebooks").upload(path, raw, {
+		contentType: "application/pdf",
+		upsert: false
+	});
+	if (error) throw new Error(`Échec de l'upload PDF : ${error.message}`);
+	return { path };
+});
+//#endregion
+export { adminDeleteChapter_createServerFn_handler, adminDeleteEbook_createServerFn_handler, adminGrantEbookAccess_createServerFn_handler, adminListChapters_createServerFn_handler, adminListEbooks_createServerFn_handler, adminListReaders_createServerFn_handler, adminRevokeEbookAccess_createServerFn_handler, adminSaveChapter_createServerFn_handler, adminSaveEbook_createServerFn_handler, adminSetRole_createServerFn_handler, adminUploadEbookPdf_createServerFn_handler, getAdminStats_createServerFn_handler };

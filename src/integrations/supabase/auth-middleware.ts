@@ -1,0 +1,81 @@
+import { createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./types";
+import { getSupabasePublicEnv } from "@/lib/supabase-env";
+import { unauthorized } from "@/lib/http-errors";
+
+function isNewSupabaseApiKey(value: string): boolean {
+  return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
+}
+
+function createSupabaseFetch(supabaseKey: string): typeof fetch {
+  return (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+
+    if (init?.headers) {
+      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+    }
+
+    if (isNewSupabaseApiKey(supabaseKey) && headers.get("Authorization") === `Bearer ${supabaseKey}`) {
+      headers.delete("Authorization");
+    }
+
+    headers.set("apikey", supabaseKey);
+    return fetch(input, { ...init, headers });
+  };
+}
+
+export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
+  const { url, key } = getSupabasePublicEnv();
+
+  if (!url || !key) {
+    throw unauthorized("Configuration Supabase manquante.");
+  }
+
+  const request = getRequest();
+
+  if (!request?.headers) {
+    throw unauthorized();
+  }
+
+  const authHeader = request.headers.get("authorization");
+
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw unauthorized();
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+  if (!token || token.split(".").length !== 3) {
+    throw unauthorized("Jeton invalide.");
+  }
+
+  const supabase = createClient<Database>(url, key, {
+    global: {
+      fetch: createSupabaseFetch(key),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+    auth: {
+      storage: undefined,
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+
+  const { data, error } = await supabase.auth.getClaims(token);
+  if (error || !data?.claims?.sub) {
+    throw unauthorized("Session expirée ou invalide.");
+  }
+
+  return next({
+    context: {
+      supabase,
+      userId: data.claims.sub,
+      claims: data.claims,
+    },
+  });
+});

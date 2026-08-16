@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Help Life Building">
+  <rect width="32" height="32" rx="8" fill="#9B4FD4"/>
+  <circle cx="16" cy="10" r="5.5" fill="#FFEB00"/>
+  <rect x="14" y="14" width="4" height="10" rx="1" fill="#FFEB00"/>
+  <rect x="11" y="22" width="10" height="2.5" rx="1" fill="#FFEB00"/>
+</svg>

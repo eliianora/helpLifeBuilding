@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-BkSabwWG.js";import{t}from"./admin-resource-page-B_g23Dfm.js";var n=e();function r(){return(0,n.jsx)(t,{resource:`categoriesProjets`,title:`Catégories projets`,description:`Organisez les projets et réalisations.`,fields:[{key:`nom`,label:`Nom`,required:!0}],columns:[{key:`nom`,label:`Nom`}]})}export{r as component};

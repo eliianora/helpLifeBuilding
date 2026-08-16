@@ -1,0 +1,249 @@
+import { r as __toESM } from "../_runtime.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { h as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-collection+[...].mjs";
+import { t as Button } from "./button-CWkTyF61.mjs";
+import { i as useQuery } from "../_libs/tanstack__react-query.mjs";
+import { K as ChevronRight, j as Library, q as ChevronLeft } from "../_libs/lucide-react.mjs";
+import { i as SiteHeader } from "./site-header-CKKobd7D.mjs";
+import { a as saveProgress, i as getReaderBook, o as useServerFn, t as Progress } from "./progress-bPK1miZt.mjs";
+import { t as Route } from "./lecture._slug-DEf99ni7.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/lecture._slug-B2AmFRrl.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+function ReaderPage() {
+	const { slug } = Route.useParams();
+	const fetchBook = useServerFn(getReaderBook);
+	const persist = useServerFn(saveProgress);
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["reader", slug],
+		queryFn: () => fetchBook({ data: { slug } })
+	});
+	const [index, setIndex] = (0, import_react.useState)(0);
+	const [scrolled, setScrolled] = (0, import_react.useState)(0);
+	const initialised = (0, import_react.useRef)(false);
+	const contentRef = (0, import_react.useRef)(null);
+	const chapters = data?.hasAccess ? data.chapters : [];
+	const total = chapters.length;
+	const current = chapters[index];
+	const overallPercent = total ? Math.min(100, Math.round((index + scrolled) / total * 100)) : 0;
+	(0, import_react.useEffect)(() => {
+		if (initialised.current || !data?.hasAccess || !data.progress || total === 0) return;
+		initialised.current = true;
+		const target = chapters.findIndex((c) => c.position === data.progress?.chapter_position);
+		if (target >= 0) setIndex(target);
+	}, [
+		data,
+		chapters,
+		total
+	]);
+	(0, import_react.useEffect)(() => {
+		function onScroll() {
+			const node = contentRef.current;
+			if (!node) return;
+			const start = node.offsetTop;
+			const height = node.offsetHeight - window.innerHeight;
+			if (height <= 0) return setScrolled(1);
+			setScrolled(Math.max(0, Math.min(1, (window.scrollY - start) / height)));
+		}
+		window.addEventListener("scroll", onScroll, { passive: true });
+		onScroll();
+		return () => window.removeEventListener("scroll", onScroll);
+	}, [index, total]);
+	const save = (0, import_react.useCallback)((chapterPosition, percent) => {
+		persist({ data: {
+			slug,
+			chapterPosition,
+			percent
+		} }).catch(() => {});
+	}, [persist, slug]);
+	(0, import_react.useEffect)(() => {
+		if (!current || !data?.hasAccess) return;
+		const timer = setTimeout(() => save(current.position, overallPercent), 1200);
+		return () => clearTimeout(timer);
+	}, [
+		current,
+		overallPercent,
+		save,
+		data
+	]);
+	function goTo(next) {
+		setIndex(next);
+		setScrolled(0);
+		window.scrollTo({ top: 0 });
+	}
+	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReaderShell, { children: "Chargement de votre livre…" });
+	if (error || !data) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReaderShell, { children: "Ce livre n'a pas pu être ouvert." });
+	if (!data.hasAccess) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReaderShell, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+		className: "font-display text-xl",
+		children: "Ce livre n'est pas dans votre bibliothèque."
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+		asChild: true,
+		className: "mt-5",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+			to: "/ebooks/$slug",
+			params: { slug },
+			children: "Voir la fiche du livre"
+		})
+	})] });
+	if (data.pdfUrl) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "min-h-screen",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SiteHeader, {}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "border-b border-border bg-white",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+						to: "/bibliotheque",
+						className: "inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Library, {
+							className: "size-4",
+							"aria-hidden": true
+						}), " Bibliothèque"]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "truncate text-sm font-semibold",
+						children: data.ebook.title
+					})]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", {
+				className: "mx-auto max-w-6xl px-3 py-4 sm:px-5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("iframe", {
+					title: `Lecture de ${data.ebook.title}`,
+					src: `${data.pdfUrl}#toolbar=0&navpanes=0`,
+					referrerPolicy: "no-referrer",
+					className: "h-[calc(100vh-10rem)] min-h-[640px] w-full border border-border bg-white"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+					className: "mt-3 text-center text-xs text-muted-foreground",
+					children: [
+						"Exemplaire personnel de ",
+						data.email,
+						" — lecture en ligne, reproduction interdite."
+					]
+				})]
+			})
+		]
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "min-h-screen",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SiteHeader, {}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "sticky top-16 z-30 border-b border-border/60 bg-background/90 backdrop-blur",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mx-auto flex max-w-3xl items-center gap-4 px-5 py-3",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+							to: "/bibliotheque",
+							className: "inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Library, {
+								className: "size-4",
+								"aria-hidden": true
+							}), " Bibliothèque"]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex-1",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Progress, { value: overallPercent })
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+							className: "text-xs tabular-nums text-muted-foreground",
+							children: [overallPercent, "%"]
+						})
+					]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", {
+				className: "relative mx-auto max-w-3xl px-5 py-12",
+				onContextMenu: (event) => event.preventDefault(),
+				onCopy: (event) => event.preventDefault(),
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+						children: data.ebook.title
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+						className: "mt-3 font-display text-3xl tracking-tight",
+						children: [
+							current?.position,
+							". ",
+							current?.title
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						ref: contentRef,
+						className: "prose-reader no-select relative mt-8 space-y-6 text-foreground/90",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"aria-hidden": true,
+							className: "pointer-events-none absolute inset-0 flex items-center justify-center text-center text-2xl font-medium text-foreground/[0.04] select-none",
+							children: data.email
+						}), current?.content.split("\n\n").map((paragraph, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: paragraph }, i))]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
+						className: "mt-14 flex items-center justify-between gap-4 border-t border-border/60 pt-6",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "outline",
+								disabled: index === 0,
+								onClick: () => goTo(index - 1),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, {
+									className: "size-4",
+									"aria-hidden": true
+								}), " Précédent"]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-sm text-muted-foreground",
+								children: [
+									"Chapitre ",
+									index + 1,
+									" / ",
+									total
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								disabled: index >= total - 1,
+								onClick: () => goTo(index + 1),
+								children: ["Suivant ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, {
+									className: "size-4",
+									"aria-hidden": true
+								})]
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ol", {
+						className: "mt-12 space-y-2 text-sm",
+						children: chapters.map((chapter, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+							type: "button",
+							onClick: () => goTo(i),
+							className: `w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-secondary ${i === index ? "bg-secondary font-medium" : "text-muted-foreground"}`,
+							children: [
+								chapter.position,
+								". ",
+								chapter.title
+							]
+						}) }, chapter.position))
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+						className: "mt-10 text-center text-xs text-muted-foreground",
+						children: [
+							"Exemplaire personnel de ",
+							data.email,
+							" — lecture en ligne, reproduction interdite."
+						]
+					})
+				]
+			})
+		]
+	});
+}
+function ReaderShell({ children }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "min-h-screen",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SiteHeader, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
+			className: "mx-auto max-w-3xl px-5 py-24 text-center text-muted-foreground",
+			children
+		})]
+	});
+}
+//#endregion
+export { ReaderPage as component };

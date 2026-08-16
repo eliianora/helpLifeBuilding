@@ -1,0 +1,210 @@
+import { r as __toESM } from "../_runtime.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-collection+[...].mjs";
+import { t as Button } from "./button-CWkTyF61.mjs";
+import { i as useQuery, o as useQueryClient, t as useMutation } from "../_libs/tanstack__react-query.mjs";
+import { n as adminLegacyList, r as adminLegacySave, t as adminLegacyDelete } from "./admin-legacy.functions-BrQcRsM7.mjs";
+import { t as Input } from "./input-Oigv6AWn.mjs";
+import { t as Label } from "./label-DWmshiB9.mjs";
+import { t as Textarea } from "./textarea-B-JceDfa.mjs";
+import { n as toast } from "../_libs/sonner.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/admin-resource-page-B8vUzpyt.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+function emptyValues(fields) {
+	return Object.fromEntries(fields.map((field) => [field.key, field.defaultValue ?? (field.type === "checkbox" ? false : field.type === "number" ? 0 : "")]));
+}
+function displayValue(value) {
+	if (value === null || value === "") return "—";
+	if (typeof value === "boolean") return value ? "Oui" : "Non";
+	if (Array.isArray(value)) return value.join(", ") || "—";
+	return String(value);
+}
+function AdminResourcePage({ resource, title, description, fields, columns, allowCreate = true, allowDelete = true, editLabel = "Modifier" }) {
+	const queryClient = useQueryClient();
+	const queryKey = ["admin-resource", resource];
+	const [form, setForm] = (0, import_react.useState)(null);
+	const { data = [], isLoading, error } = useQuery({
+		queryKey,
+		queryFn: () => adminLegacyList({ data: { resource } })
+	});
+	const save = useMutation({
+		mutationFn: (payload) => adminLegacySave({ data: {
+			resource,
+			id: payload.id,
+			values: payload.values
+		} }),
+		onSuccess: () => {
+			toast.success("Enregistrement effectué.");
+			setForm(null);
+			queryClient.invalidateQueries({ queryKey });
+			queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+		},
+		onError: (caught) => toast.error(caught.message)
+	});
+	const remove = useMutation({
+		mutationFn: (id) => adminLegacyDelete({ data: {
+			resource,
+			id
+		} }),
+		onSuccess: () => {
+			toast.success("Élément supprimé.");
+			queryClient.invalidateQueries({ queryKey });
+		},
+		onError: (caught) => toast.error(caught.message)
+	});
+	function edit(row) {
+		setForm({
+			id: String(row.id),
+			values: Object.fromEntries(fields.map((field) => [field.key, row[field.key] ?? emptyValues([field])[field.key]]))
+		});
+	}
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "mx-auto max-w-6xl",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-wrap items-end justify-between gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+					className: "font-display text-3xl font-extrabold uppercase tracking-tight",
+					children: title
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "mt-2 text-muted-foreground",
+					children: description
+				})] }), allowCreate ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					onClick: () => setForm({ values: emptyValues(fields) }),
+					children: "Ajouter"
+				}) : null]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "mt-4 mb-8 block h-0.5 w-14 bg-primary",
+				"aria-hidden": true
+			}),
+			error ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "mb-5 border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive",
+				children: error.message
+			}) : null,
+			isLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground",
+				children: "Chargement…"
+			}) : null,
+			!isLoading && !error && data.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "border border-dashed border-border bg-white px-5 py-10 text-center text-muted-foreground",
+				children: "Aucun élément pour le moment."
+			}) : null,
+			data.length ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "overflow-x-auto border border-border bg-white",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
+					className: "w-full min-w-[720px] text-left text-sm",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
+						className: "bg-secondary text-xs font-bold uppercase tracking-wide text-muted-foreground",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [columns.map((column) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+							className: "px-4 py-3",
+							children: column.label
+						}, column.key)), fields.length || allowDelete ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+							className: "px-4 py-3 text-right",
+							children: "Actions"
+						}) : null] })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: data.map((row) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+						className: "border-t border-border",
+						children: [columns.map((column) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+							className: "max-w-xs px-4 py-3",
+							children: column.format ? column.format(row[column.key] ?? null, row) : displayValue(row[column.key] ?? null)
+						}, column.key)), fields.length || allowDelete ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+							className: "whitespace-nowrap px-4 py-3 text-right",
+							children: [fields.length ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "sm",
+								onClick: () => edit(row),
+								children: editLabel
+							}) : null, allowDelete ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "sm",
+								disabled: remove.isPending,
+								onClick: () => {
+									if (window.confirm("Supprimer définitivement cet élément ?")) remove.mutate(String(row.id));
+								},
+								children: "Supprimer"
+							}) : null]
+						}) : null]
+					}, String(row.id))) })]
+				})
+			}) : null,
+			form ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+				className: "premium-card mt-8 grid gap-4 p-6 md:grid-cols-2",
+				onSubmit: (event) => {
+					event.preventDefault();
+					save.mutate(form);
+				},
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+						className: "font-display text-xl font-extrabold uppercase md:col-span-2",
+						children: form.id ? editLabel : `Ajouter — ${title}`
+					}),
+					fields.map((field) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AdminFormField, {
+						field,
+						value: form.values[field.key],
+						onChange: (value) => setForm({
+							...form,
+							values: {
+								...form.values,
+								[field.key]: value
+							}
+						})
+					}, field.key)),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex gap-3 md:col-span-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							type: "submit",
+							disabled: save.isPending,
+							children: save.isPending ? "Enregistrement…" : "Enregistrer"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							type: "button",
+							variant: "outline",
+							onClick: () => setForm(null),
+							children: "Annuler"
+						})]
+					})
+				]
+			}) : null
+		]
+	});
+}
+function AdminFormField({ field, value, onChange }) {
+	if (field.type === "checkbox") return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
+		className: "flex items-center gap-2 self-end py-3 text-sm font-semibold",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+			type: "checkbox",
+			checked: Boolean(value),
+			onChange: (event) => onChange(event.target.checked)
+		}), field.label]
+	});
+	const stringValue = Array.isArray(value) ? value.join(", ") : String(value ?? "");
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: field.type === "textarea" ? "space-y-2 md:col-span-2" : "space-y-2",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: field.label }), field.type === "textarea" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+			className: "min-h-28",
+			required: field.required,
+			value: stringValue,
+			onChange: (event) => onChange(event.target.value || null)
+		}) : field.type === "select" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
+			className: "h-10 w-full border border-input bg-white px-3 text-sm",
+			required: field.required,
+			value: stringValue,
+			onChange: (event) => onChange(event.target.value),
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+				value: "",
+				children: "Sélectionner…"
+			}), field.options?.map((option) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+				value: option.value,
+				children: option.label
+			}, option.value))]
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+			type: field.type === "number" ? "number" : field.type ?? "text",
+			required: field.required,
+			value: stringValue,
+			onChange: (event) => onChange(field.type === "number" ? Number(event.target.value) : event.target.value)
+		})]
+	});
+}
+//#endregion
+export { AdminResourcePage as t };

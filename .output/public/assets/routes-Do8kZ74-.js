@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-BkSabwWG.js";var t=e(),n=()=>(0,t.jsx)(`div`,{className:`p-16 text-center text-muted-foreground`,children:`Le catalogue n'a pas pu être chargé.`});export{n as errorComponent};

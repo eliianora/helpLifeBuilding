@@ -1,0 +1,1 @@
+import{r as e,t}from"./useBaseQuery-C7PXbnAB.js";import{w as n}from"./index-CnaH8LM7.js";function r(n,r){return t(n,e,r)}var i=n({type:`function`});export{r as n,i as t};

@@ -1,0 +1,220 @@
+import { n as getSupabasePublicEnv } from "./ssr.mjs";
+import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
+import { c as createServerFn } from "./createServerFn-CIHAFgYl.mjs";
+import { l as stringType, s as objectType } from "../_libs/zod.mjs";
+import { t as createServerRpc } from "./createServerRpc-B90ckaqP.mjs";
+import processModule from "node:process";
+//#region node_modules/.nitro/vite/services/ssr/assets/catalog.functions-BkGiNUGz.js
+var DEMO_EBOOKS = [
+	{
+		id: "demo-clarte",
+		slug: "clarte",
+		title: "Clarté",
+		subtitle: "Décider sans se perdre",
+		description: "Un guide court pour trier le bruit, formuler vos critères et prendre une décision que vous assumerez demain.",
+		cover_key: "clarte",
+		price_label: "4 500 FCFA",
+		pages: 96,
+		reading_minutes: 120,
+		category: "Décision"
+	},
+	{
+		id: "demo-traction",
+		slug: "traction",
+		title: "Traction",
+		subtitle: "Passer de l'idée à l'offre",
+		description: "Les étapes concrètes pour lancer une offre simple, la tester vite et ajuster sans s'épuiser.",
+		cover_key: "traction",
+		price_label: "4 500 FCFA",
+		pages: 88,
+		reading_minutes: 105,
+		category: "Entrepreneuriat"
+	},
+	{
+		id: "demo-lettres",
+		slug: "lettres",
+		title: "Lettres à une fondatrice",
+		subtitle: "Ce qu'on ne dit pas assez",
+		description: "Douze lettres intimes sur le doute, la fatigue et la façon de continuer sans se trahir.",
+		cover_key: "lettres",
+		price_label: "3 900 FCFA",
+		pages: 72,
+		reading_minutes: 90,
+		category: "Récit"
+	}
+];
+var DEMO_CHAPTERS = {
+	clarte: [
+		{
+			position: 1,
+			title: "Le bruit n'est pas une preuve",
+			is_preview: true,
+			content: "Il y a des semaines où tout semble urgent.\n\nOn ouvre dix onglets, on relit trois fils de messages, on demande un avis de plus — et l'on finit par ne rien trancher. Ce n'est pas de la paresse. C'est un excès de signaux sans critère.\n\nCe livre part d'une idée simple : une bonne décision ne demande pas plus d'informations, mais une meilleure formulation de ce qui compte pour vous."
+		},
+		{
+			position: 2,
+			title: "Nommer le vrai enjeu",
+			is_preview: false,
+			content: ""
+		},
+		{
+			position: 3,
+			title: "Trois critères suffisent",
+			is_preview: false,
+			content: ""
+		},
+		{
+			position: 4,
+			title: "Choisir et assumer",
+			is_preview: false,
+			content: ""
+		}
+	],
+	traction: [
+		{
+			position: 1,
+			title: "Une offre, pas un manifeste",
+			is_preview: true,
+			content: "La plupart des projets traînent parce qu'ils cherchent à être parfaits avant d'exister.\n\nUne offre utile se décrit en une phrase : pour qui, quel résultat, en combien de temps. Tout le reste — le site, la charte, la stratégie complète — peut attendre.\n\nCommencez petit. Testez vite. Corrigez sans vous punir."
+		},
+		{
+			position: 2,
+			title: "Le premier prix",
+			is_preview: false,
+			content: ""
+		},
+		{
+			position: 3,
+			title: "Trouver dix personnes",
+			is_preview: false,
+			content: ""
+		}
+	],
+	lettres: [
+		{
+			position: 1,
+			title: "Lettre 1 — Le dimanche soir",
+			is_preview: true,
+			content: "Chère toi,\n\nCe dimanche où tu prépares la semaine en te demandant si tu tiendras encore le rythme, je voulais te dire une chose : tu n'es pas en retard. Tu es en train de construire quelque chose qui demande du temps.\n\nLa fatigue n'est pas un échec. C'est parfois le signe qu'il faut simplifier, pas accelerer."
+		},
+		{
+			position: 2,
+			title: "Lettre 2 — Quand tout dépend de toi",
+			is_preview: false,
+			content: ""
+		},
+		{
+			position: 3,
+			title: "Lettre 3 — La permission de changer d'avis",
+			is_preview: false,
+			content: ""
+		}
+	]
+};
+function demoListEbooks() {
+	return DEMO_EBOOKS;
+}
+function demoGetEbookBySlug(slug) {
+	const ebook = DEMO_EBOOKS.find((b) => b.slug === slug);
+	if (!ebook) return null;
+	const chapters = DEMO_CHAPTERS[slug] ?? [];
+	const toc = chapters.map(({ position, title, is_preview }) => ({
+		position,
+		title,
+		is_preview
+	}));
+	const sample = chapters.filter((c) => c.is_preview).map(({ position, title, content }) => ({
+		position,
+		title,
+		content
+	}));
+	const related = DEMO_EBOOKS.filter((b) => b.slug !== slug && b.category === ebook.category).slice(0, 3);
+	if (related.length === 0) return {
+		ebook,
+		toc,
+		sample,
+		related: DEMO_EBOOKS.filter((b) => b.slug !== slug).slice(0, 3)
+	};
+	return {
+		ebook,
+		toc,
+		sample,
+		related
+	};
+}
+function isDemoMode() {
+	return processModule.env.CATALOG_DEMO === "1" || processModule.env.VITE_CATALOG_DEMO === "1";
+}
+function supabaseConfigured() {
+	const { url, key } = getSupabasePublicEnv();
+	return Boolean(url && key);
+}
+function publicClient() {
+	const { url, key } = getSupabasePublicEnv();
+	if (!url || !key) throw new Error("Missing Supabase environment variable(s).");
+	return createClient(url, key, {
+		auth: {
+			storage: void 0,
+			persistSession: false,
+			autoRefreshToken: false
+		},
+		global: { fetch: (input, init) => {
+			const h = new Headers(init?.headers);
+			if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+			h.set("apikey", key);
+			return fetch(input, {
+				...init,
+				headers: h
+			});
+		} }
+	});
+}
+var listEbooks_createServerFn_handler = createServerRpc({
+	id: "9d8d0f2c57d475cdb9b1684d50a9dd67bcefea9451ac4769d1c21369e26eab6e",
+	name: "listEbooks",
+	filename: "src/lib/catalog.functions.ts"
+}, (opts) => listEbooks.__executeServer(opts));
+var listEbooks = createServerFn({ method: "GET" }).handler(listEbooks_createServerFn_handler, async () => {
+	if (isDemoMode() || !supabaseConfigured()) {
+		console.warn("[catalog] Mode démo — Supabase indisponible ou CATALOG_DEMO=1");
+		return demoListEbooks();
+	}
+	try {
+		const { data, error } = await publicClient().from("ebooks").select("id, slug, title, subtitle, description, cover_key, price_label, pages, reading_minutes, category").eq("published", true).order("position", { ascending: true });
+		if (error) throw new Error(error.message);
+		return data ?? [];
+	} catch (err) {
+		console.warn("[catalog] Supabase inaccessible, bascule sur le catalogue démo:", err);
+		return demoListEbooks();
+	}
+});
+var getEbookBySlug_createServerFn_handler = createServerRpc({
+	id: "bb40d3c28e2844b3d182c27f79d815407af7cc4789874c41634a961c718f2915",
+	name: "getEbookBySlug",
+	filename: "src/lib/catalog.functions.ts"
+}, (opts) => getEbookBySlug.__executeServer(opts));
+var getEbookBySlug = createServerFn({ method: "GET" }).inputValidator((data) => objectType({ slug: stringType().min(1).max(120) }).parse(data)).handler(getEbookBySlug_createServerFn_handler, async ({ data }) => {
+	if (isDemoMode() || !supabaseConfigured()) return demoGetEbookBySlug(data.slug);
+	try {
+		const supabase = publicClient();
+		const { data: ebook, error } = await supabase.from("ebooks").select("id, slug, title, subtitle, description, cover_key, price_label, pages, reading_minutes, category").eq("slug", data.slug).eq("published", true).maybeSingle();
+		if (error) throw new Error(error.message);
+		if (!ebook) return demoGetEbookBySlug(data.slug);
+		const { data: toc } = await supabase.from("chapters").select("position, title, is_preview").eq("ebook_id", ebook.id).order("position", { ascending: true });
+		const { data: sample } = await supabase.from("chapters").select("position, title, content").eq("ebook_id", ebook.id).eq("is_preview", true).order("position", { ascending: true });
+		let relatedQuery = supabase.from("ebooks").select("slug, title, subtitle, cover_key, price_label, category").eq("published", true).neq("id", ebook.id).order("position", { ascending: true }).limit(3);
+		if (ebook.category) relatedQuery = relatedQuery.eq("category", ebook.category);
+		const { data: related } = await relatedQuery;
+		return {
+			ebook,
+			toc: toc ?? [],
+			sample: sample ?? [],
+			related: related ?? []
+		};
+	} catch (err) {
+		console.warn("[catalog] Supabase inaccessible, bascule sur la fiche démo:", err);
+		return demoGetEbookBySlug(data.slug);
+	}
+});
+//#endregion
+export { getEbookBySlug_createServerFn_handler, listEbooks_createServerFn_handler };

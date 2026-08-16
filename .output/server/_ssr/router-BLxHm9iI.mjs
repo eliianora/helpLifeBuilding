@@ -1,0 +1,791 @@
+import { r as __toESM } from "../_runtime.mjs";
+import { t as supabase } from "./client-DqaBVmPg.mjs";
+import { t as fetchUserRole } from "./admin-Bv8g1X24.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { A as redirect, _ as useRouter, c as HeadContent, d as Outlet, f as lazyRouteComponent, h as Link, m as createRootRouteWithContext, p as createFileRoute, s as Scripts, u as createRouter } from "../_libs/@tanstack/react-router+[...].mjs";
+import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-collection+[...].mjs";
+import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
+import { a as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
+import { t as Toaster } from "../_libs/sonner.mjs";
+import { t as Route$26 } from "./auth-BInFQ-XR.mjs";
+import { t as Route$27 } from "./auth.callback-D4Izfi9s.mjs";
+import { n as listEbooks } from "./catalog.functions-B22O1TPy.mjs";
+import { t as Route$28 } from "./ebooks._slug-rFUtL_kQ.mjs";
+import { t as ebooksQuery } from "./ebooks.index-DRLIMACr.mjs";
+import { t as Route$29 } from "./lecture._slug-DEf99ni7.mjs";
+import { t as ebooksQuery$1 } from "./routes-CRNMPnCo.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-BLxHm9iI.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+var styles_default = "/assets/styles-H5FvZ56u.css";
+function reportLovableError(error, context = {}) {
+	if (typeof window === "undefined") return;
+	window.__lovableEvents?.captureException?.(error, {
+		source: "react_error_boundary",
+		route: window.location.pathname,
+		...context
+	}, {
+		mechanism: "react_error_boundary",
+		handled: false,
+		severity: "error"
+	});
+	const message = error instanceof Response ? `Response ${error.status}${error.url ? ` at ${error.url}` : ""}` : error instanceof Error ? error.message : String(error);
+	window.__lovableReportRuntimeError?.({
+		message,
+		stack: error instanceof Error ? error.stack : void 0,
+		filename: window.location.pathname
+	});
+}
+var Toaster$1 = ({ ...props }) => {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, {
+		className: "toaster group",
+		toastOptions: { classNames: {
+			toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
+			description: "group-[.toast]:text-muted-foreground",
+			actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+			cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground"
+		} },
+		...props
+	});
+};
+function NotFoundComponent() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "flex min-h-screen items-center justify-center bg-background px-4",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "max-w-md text-center",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+					className: "text-7xl font-bold text-foreground",
+					children: "404"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					className: "mt-4 text-xl font-semibold text-foreground",
+					children: "Page not found"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "mt-2 text-sm text-muted-foreground",
+					children: "The page you're looking for doesn't exist or has been moved."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "mt-6",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+						to: "/",
+						className: "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
+						children: "Go home"
+					})
+				})
+			]
+		})
+	});
+}
+function ErrorComponent({ error, reset }) {
+	console.error(error);
+	const router = useRouter();
+	(0, import_react.useEffect)(() => {
+		reportLovableError(error, { boundary: "tanstack_root_error_component" });
+	}, [error]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "flex min-h-screen items-center justify-center bg-background px-4",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "max-w-md text-center",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+					className: "text-xl font-semibold tracking-tight text-foreground",
+					children: "This page didn't load"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "mt-2 text-sm text-muted-foreground",
+					children: "Something went wrong on our end. You can try refreshing or head back home."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mt-6 flex flex-wrap justify-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						onClick: () => {
+							router.invalidate();
+							reset();
+						},
+						className: "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
+						children: "Try again"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+						href: "/",
+						className: "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent",
+						children: "Go home"
+					})]
+				})
+			]
+		})
+	});
+}
+var Route$25 = createRootRouteWithContext()({
+	head: () => ({
+		meta: [
+			{ charSet: "utf-8" },
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1"
+			},
+			{ title: "Help Life Building — Ebooks à lire en ligne" },
+			{
+				name: "description",
+				content: "Help Life Building — coaching de vie, ebooks et ateliers avec Prisca Brou. Bien-être mental, éducation parentale et leadership personnel."
+			},
+			{
+				name: "author",
+				content: "Prisca Brou"
+			},
+			{
+				property: "og:title",
+				content: "Help Life Building — Ebooks à lire en ligne"
+			},
+			{
+				property: "og:description",
+				content: "Coaching de vie, ebooks et ateliers pour construire votre résilience et votre leadership."
+			},
+			{
+				property: "og:type",
+				content: "website"
+			},
+			{
+				name: "twitter:card",
+				content: "summary_large_image"
+			}
+		],
+		links: [
+			{
+				rel: "preconnect",
+				href: "https://fonts.googleapis.com"
+			},
+			{
+				rel: "preconnect",
+				href: "https://fonts.gstatic.com",
+				crossOrigin: "anonymous"
+			},
+			{
+				rel: "stylesheet",
+				href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+			},
+			{
+				rel: "stylesheet",
+				href: styles_default
+			},
+			{
+				rel: "icon",
+				href: "/favicon.svg",
+				type: "image/svg+xml"
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/logo2.png"
+			}
+		]
+	}),
+	shellComponent: RootShell,
+	component: RootComponent,
+	notFoundComponent: NotFoundComponent,
+	errorComponent: ErrorComponent
+});
+function RootShell({ children }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("html", {
+		lang: "fr",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("head", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HeadContent, {}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("body", { children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Scripts, {})] })]
+	});
+}
+function RootComponent() {
+	const { queryClient } = Route$25.useRouteContext();
+	const router = useRouter();
+	(0, import_react.useEffect)(() => {
+		const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+			if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+			router.invalidate();
+			if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+		});
+		return () => sub.subscription.unsubscribe();
+	}, [router, queryClient]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(QueryClientProvider, {
+		client: queryClient,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster$1, { position: "top-center" })]
+	});
+}
+var $$splitComponentImporter$23 = () => import("./routes-CW9CcQcw.mjs");
+var $$splitErrorComponentImporter$1 = () => import("./routes-BZ9LX3tP.mjs");
+var Route$24 = createFileRoute("/")({
+	head: () => ({ meta: [
+		{ title: "Help Life Building — Ebooks à lire en ligne" },
+		{
+			name: "description",
+			content: "Help Life Building — coaching de vie, ebooks et ateliers avec Prisca Brou. Bien-être mental, éducation parentale et leadership personnel."
+		},
+		{
+			property: "og:title",
+			content: "Help Life Building — Ebooks à lire en ligne"
+		},
+		{
+			property: "og:description",
+			content: "Coaching de vie, ebooks et ateliers pour construire votre résilience et votre leadership."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	loader: ({ context }) => {
+		context.queryClient.ensureQueryData(ebooksQuery$1);
+	},
+	errorComponent: lazyRouteComponent($$splitErrorComponentImporter$1, "errorComponent"),
+	component: lazyRouteComponent($$splitComponentImporter$23, "component")
+});
+var $$splitComponentImporter$22 = () => import("./route-Di7iQBCH.mjs");
+var Route$23 = createFileRoute("/_authenticated")({
+	ssr: false,
+	beforeLoad: async () => {
+		const { data, error } = await supabase.auth.getUser();
+		if (error || !data.user) throw redirect({ to: "/auth" });
+		return { user: data.user };
+	},
+	component: lazyRouteComponent($$splitComponentImporter$22, "component")
+});
+var $$splitComponentImporter$21 = () => import("./a-propos-BRQaBHmp.mjs");
+var Route$22 = createFileRoute("/a-propos")({
+	head: () => ({ meta: [
+		{ title: "À propos de Prisca Brou, fondatrice | Help Life Building" },
+		{
+			name: "description",
+			content: "Prisca Brou, anthropologue et coach : 16 ans d'innovation sociale en Afrique, éducation parentale, bien-être mental et leadership personnel."
+		},
+		{
+			property: "og:title",
+			content: "À propos de Prisca Brou, fondatrice | Help Life Building"
+		},
+		{
+			property: "og:description",
+			content: "Le parcours de Prisca Brou, fondatrice de Help Life Building."
+		},
+		{
+			property: "og:type",
+			content: "profile"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$21, "component")
+});
+var $$splitComponentImporter$20 = () => import("./route-TuVCUHZe.mjs");
+var Route$21 = createFileRoute("/admin")({
+	ssr: false,
+	beforeLoad: async ({ location }) => {
+		const { data, error } = await supabase.auth.getUser();
+		if (error || !data.user) throw redirect({
+			to: "/auth",
+			search: { redirect: location.pathname }
+		});
+		const role = await fetchUserRole(data.user.id);
+		if (role !== "admin") throw redirect({ to: "/bibliotheque" });
+		return {
+			user: data.user,
+			role
+		};
+	},
+	component: lazyRouteComponent($$splitComponentImporter$20, "component")
+});
+var $$splitComponentImporter$19 = () => import("./communaute-BYGyezZb.mjs");
+var Route$20 = createFileRoute("/communaute")({
+	head: () => ({ meta: [
+		{ title: "Communauté des lectrices | Help Life Building" },
+		{
+			name: "description",
+			content: "Rejoignez la communauté Help Life Building : échanges entre lectrices, ateliers en direct et rendez-vous mensuels."
+		},
+		{
+			property: "og:title",
+			content: "Communauté des lectrices | Help Life Building"
+		},
+		{
+			property: "og:description",
+			content: "Échangez, apprenez et avancez avec les lectrices Help Life Building."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$19, "component")
+});
+var $$splitComponentImporter$18 = () => import("./portfolio-BgQckU37.mjs");
+var Route$19 = createFileRoute("/portfolio")({
+	head: () => ({ meta: [
+		{ title: "Portfolio — nos réalisations | Help Life Building" },
+		{
+			name: "description",
+			content: "Ebooks, ateliers, podcast et programmes d'accompagnement : découvrez les réalisations de Help Life Building."
+		},
+		{
+			property: "og:title",
+			content: "Portfolio — nos réalisations | Help Life Building"
+		},
+		{
+			property: "og:description",
+			content: "Les projets éditoriaux et d'accompagnement menés par Help Life Building."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$18, "component")
+});
+var $$splitComponentImporter$17 = () => import("./rdv-BCjpNXTU.mjs");
+var Route$18 = createFileRoute("/rdv")({
+	head: () => ({ meta: [
+		{ title: "Prendre rendez-vous | Help Life Building" },
+		{
+			name: "description",
+			content: "Réservez un coaching parental, un atelier ou une formation institution avec Help Life Building."
+		},
+		{
+			property: "og:title",
+			content: "Prendre rendez-vous | Help Life Building"
+		},
+		{
+			property: "og:description",
+			content: "Choisissez votre service, votre date et votre créneau en ligne."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$17, "component")
+});
+var $$splitComponentImporter$16 = () => import("./services-CoUAgeGN.mjs");
+var Route$17 = createFileRoute("/services")({
+	head: () => ({ meta: [
+		{ title: "Services — coaching et ateliers | Help Life Building" },
+		{
+			name: "description",
+			content: "Coaching parental, ateliers familles / femmes / adolescents, et formations pour entreprises et institutions."
+		},
+		{
+			property: "og:title",
+			content: "Services — coaching et ateliers | Help Life Building"
+		},
+		{
+			property: "og:description",
+			content: "Coaching parental, ateliers et formations institutions avec Help Life Building."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$16, "component")
+});
+var BASE_URL = "";
+var Route$16 = createFileRoute("/sitemap.xml")({ server: { handlers: { GET: async () => {
+	const xml = [
+		`<?xml version="1.0" encoding="UTF-8"?>`,
+		`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+		...[
+			{
+				path: "/",
+				changefreq: "weekly",
+				priority: "1.0"
+			},
+			{
+				path: "/ebooks",
+				changefreq: "weekly",
+				priority: "0.9"
+			},
+			{
+				path: "/a-propos",
+				changefreq: "monthly",
+				priority: "0.7"
+			},
+			{
+				path: "/services",
+				changefreq: "monthly",
+				priority: "0.8"
+			},
+			{
+				path: "/portfolio",
+				changefreq: "monthly",
+				priority: "0.6"
+			},
+			{
+				path: "/rdv",
+				changefreq: "monthly",
+				priority: "0.7"
+			},
+			{
+				path: "/communaute",
+				changefreq: "weekly",
+				priority: "0.6"
+			},
+			{
+				path: "/auth",
+				changefreq: "yearly",
+				priority: "0.3"
+			},
+			...(await listEbooks()).map((book) => ({
+				path: `/ebooks/${book.slug}`,
+				changefreq: "monthly",
+				priority: "0.8"
+			}))
+		].map((e) => [
+			`  <url>`,
+			`    <loc>${BASE_URL}${e.path}</loc>`,
+			e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
+			e.priority ? `    <priority>${e.priority}</priority>` : null,
+			`  </url>`
+		].filter(Boolean).join("\n")),
+		`</urlset>`
+	].join("\n");
+	return new Response(xml, { headers: {
+		"Content-Type": "application/xml",
+		"Cache-Control": "public, max-age=3600"
+	} });
+} } } });
+var $$splitComponentImporter$15 = () => import("./bibliotheque-BWsDXx4M.mjs");
+var Route$15 = createFileRoute("/_authenticated/bibliotheque")({
+	head: () => ({ meta: [
+		{ title: "Ma bibliothèque — Prisca Brou" },
+		{
+			name: "description",
+			content: "Vos livres et votre progression de lecture."
+		},
+		{
+			property: "og:title",
+			content: "Ma bibliothèque — Prisca Brou"
+		},
+		{
+			property: "og:description",
+			content: "Vos livres et votre progression de lecture."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary"
+		}
+	] }),
+	component: lazyRouteComponent($$splitComponentImporter$15, "component")
+});
+var $$splitComponentImporter$14 = () => import("./admin-CcptqZ1y.mjs");
+var Route$14 = createFileRoute("/admin/")({
+	head: () => ({ meta: [{ title: "Admin — Help Life Building" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$14, "component")
+});
+var $$splitComponentImporter$13 = () => import("./auteurs-Cj1FyTQL.mjs");
+var Route$13 = createFileRoute("/admin/auteurs")({
+	head: () => ({ meta: [{ title: "Auteurs — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$13, "component")
+});
+var $$splitComponentImporter$12 = () => import("./bande_inf-8_SdMoHY.mjs");
+var Route$12 = createFileRoute("/admin/bande_inf")({
+	head: () => ({ meta: [{ title: "Bande Info — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$12, "component")
+});
+var $$splitComponentImporter$11 = () => import("./categories_e-UwAfu8cZ.mjs");
+var Route$11 = createFileRoute("/admin/categories_e")({
+	head: () => ({ meta: [{ title: "Catégories Ebooks — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$11, "component")
+});
+var $$splitComponentImporter$10 = () => import("./categories_p-DIz2Lu6d.mjs");
+var Route$10 = createFileRoute("/admin/categories_p")({
+	head: () => ({ meta: [{ title: "Catégories Projets — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$10, "component")
+});
+var $$splitComponentImporter$9 = () => import("./chapitres-BarWybpM.mjs");
+var Route$9 = createFileRoute("/admin/chapitres")({
+	head: () => ({ meta: [{ title: "Chapitres — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$9, "component")
+});
+var $$splitComponentImporter$8 = () => import("./ebooks-CXVSP-FB.mjs");
+var Route$8 = createFileRoute("/admin/ebooks")({
+	head: () => ({ meta: [{ title: "Ebooks — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$8, "component")
+});
+var $$splitComponentImporter$7 = () => import("./langages-B6Z3LSLF.mjs");
+var Route$7 = createFileRoute("/admin/langages")({
+	head: () => ({ meta: [{ title: "Langages — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$7, "component")
+});
+var $$splitComponentImporter$6 = () => import("./lecteurs-CPaxuj_v.mjs");
+var Route$6 = createFileRoute("/admin/lecteurs")({
+	head: () => ({ meta: [{ title: "Lecteurs — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$6, "component")
+});
+var $$splitComponentImporter$5 = () => import("./paiements-DHQFM9tk.mjs");
+var Route$5 = createFileRoute("/admin/paiements")({
+	head: () => ({ meta: [{ title: "Paiements — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$5, "component")
+});
+var $$splitComponentImporter$4 = () => import("./paniers-CXtoFPfc.mjs");
+var Route$4 = createFileRoute("/admin/paniers")({
+	head: () => ({ meta: [{ title: "Paniers — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$4, "component")
+});
+var $$splitComponentImporter$3 = () => import("./projets-MIIMp9-T.mjs");
+var Route$3 = createFileRoute("/admin/projets")({
+	head: () => ({ meta: [{ title: "Projets — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$3, "component")
+});
+var $$splitComponentImporter$2 = () => import("./rdv-DjciEDxc.mjs");
+var Route$2 = createFileRoute("/admin/rdv")({
+	head: () => ({ meta: [{ title: "Rendez-vous — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$2, "component")
+});
+var $$splitComponentImporter$1 = () => import("./services-DGgjkIUZ.mjs");
+var Route$1 = createFileRoute("/admin/services")({
+	head: () => ({ meta: [{ title: "Services — Admin" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$1, "component")
+});
+var $$splitComponentImporter = () => import("./ebooks.index-Bq3FcU2Y.mjs");
+var $$splitNotFoundComponentImporter = () => import("./ebooks.index-C5apxKjS.mjs");
+var $$splitErrorComponentImporter = () => import("./ebooks.index-C9Pqv8Ub.mjs");
+var Route = createFileRoute("/ebooks/")({
+	head: () => ({ meta: [
+		{ title: "Tous les livres — Prisca Brou" },
+		{
+			name: "description",
+			content: "Le catalogue complet des livres numériques de Prisca Brou. Extrait gratuit sur chaque fiche."
+		},
+		{
+			property: "og:title",
+			content: "Tous les livres — Prisca Brou"
+		},
+		{
+			property: "og:description",
+			content: "Le catalogue complet des livres numériques de Prisca Brou."
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		}
+	] }),
+	loader: ({ context }) => {
+		context.queryClient.ensureQueryData(ebooksQuery);
+	},
+	errorComponent: lazyRouteComponent($$splitErrorComponentImporter, "errorComponent"),
+	notFoundComponent: lazyRouteComponent($$splitNotFoundComponentImporter, "notFoundComponent"),
+	component: lazyRouteComponent($$splitComponentImporter, "component")
+});
+var IndexRoute = Route$24.update({
+	id: "/",
+	path: "/",
+	getParentRoute: () => Route$25
+});
+var AuthenticatedRouteRoute = Route$23.update({
+	id: "/_authenticated",
+	getParentRoute: () => Route$25
+});
+var AProposRoute = Route$22.update({
+	id: "/a-propos",
+	path: "/a-propos",
+	getParentRoute: () => Route$25
+});
+var AdminRouteRoute = Route$21.update({
+	id: "/admin",
+	path: "/admin",
+	getParentRoute: () => Route$25
+});
+var AuthRoute = Route$26.update({
+	id: "/auth",
+	path: "/auth",
+	getParentRoute: () => Route$25
+});
+var CommunauteRoute = Route$20.update({
+	id: "/communaute",
+	path: "/communaute",
+	getParentRoute: () => Route$25
+});
+var PortfolioRoute = Route$19.update({
+	id: "/portfolio",
+	path: "/portfolio",
+	getParentRoute: () => Route$25
+});
+var RdvRoute = Route$18.update({
+	id: "/rdv",
+	path: "/rdv",
+	getParentRoute: () => Route$25
+});
+var ServicesRoute = Route$17.update({
+	id: "/services",
+	path: "/services",
+	getParentRoute: () => Route$25
+});
+var SitemapDotxmlRoute = Route$16.update({
+	id: "/sitemap.xml",
+	path: "/sitemap.xml",
+	getParentRoute: () => Route$25
+});
+var AuthenticatedBibliothequeRoute = Route$15.update({
+	id: "/bibliotheque",
+	path: "/bibliotheque",
+	getParentRoute: () => AuthenticatedRouteRoute
+});
+var AdminIndexRoute = Route$14.update({
+	id: "/",
+	path: "/",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminAuteursRoute = Route$13.update({
+	id: "/auteurs",
+	path: "/auteurs",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminBande_infRoute = Route$12.update({
+	id: "/bande_inf",
+	path: "/bande_inf",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminCategories_eRoute = Route$11.update({
+	id: "/categories_e",
+	path: "/categories_e",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminCategories_pRoute = Route$10.update({
+	id: "/categories_p",
+	path: "/categories_p",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminChapitresRoute = Route$9.update({
+	id: "/chapitres",
+	path: "/chapitres",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminEbooksRoute = Route$8.update({
+	id: "/ebooks",
+	path: "/ebooks",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminLangagesRoute = Route$7.update({
+	id: "/langages",
+	path: "/langages",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminLecteursRoute = Route$6.update({
+	id: "/lecteurs",
+	path: "/lecteurs",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminPaiementsRoute = Route$5.update({
+	id: "/paiements",
+	path: "/paiements",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminPaniersRoute = Route$4.update({
+	id: "/paniers",
+	path: "/paniers",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminProjetsRoute = Route$3.update({
+	id: "/projets",
+	path: "/projets",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminRdvRoute = Route$2.update({
+	id: "/rdv",
+	path: "/rdv",
+	getParentRoute: () => AdminRouteRoute
+});
+var AdminServicesRoute = Route$1.update({
+	id: "/services",
+	path: "/services",
+	getParentRoute: () => AdminRouteRoute
+});
+var AuthCallbackRoute = Route$27.update({
+	id: "/callback",
+	path: "/callback",
+	getParentRoute: () => AuthRoute
+});
+var EbooksIndexRoute = Route.update({
+	id: "/ebooks/",
+	path: "/ebooks/",
+	getParentRoute: () => Route$25
+});
+var EbooksSlugRoute = Route$28.update({
+	id: "/ebooks/$slug",
+	path: "/ebooks/$slug",
+	getParentRoute: () => Route$25
+});
+var AuthenticatedRouteRouteChildren = {
+	AuthenticatedBibliothequeRoute,
+	AuthenticatedLectureSlugRoute: Route$29.update({
+		id: "/lecture/$slug",
+		path: "/lecture/$slug",
+		getParentRoute: () => AuthenticatedRouteRoute
+	})
+};
+var AuthenticatedRouteRouteWithChildren = AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren);
+var AdminRouteRouteChildren = {
+	AdminAuteursRoute,
+	AdminBande_infRoute,
+	AdminCategories_eRoute,
+	AdminCategories_pRoute,
+	AdminChapitresRoute,
+	AdminEbooksRoute,
+	AdminLangagesRoute,
+	AdminLecteursRoute,
+	AdminPaiementsRoute,
+	AdminPaniersRoute,
+	AdminProjetsRoute,
+	AdminRdvRoute,
+	AdminServicesRoute,
+	AdminIndexRoute
+};
+var AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(AdminRouteRouteChildren);
+var AuthRouteChildren = { AuthCallbackRoute };
+var rootRouteChildren = {
+	IndexRoute,
+	AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+	AdminRouteRoute: AdminRouteRouteWithChildren,
+	AProposRoute,
+	AuthRoute: AuthRoute._addFileChildren(AuthRouteChildren),
+	CommunauteRoute,
+	PortfolioRoute,
+	RdvRoute,
+	ServicesRoute,
+	SitemapDotxmlRoute,
+	EbooksSlugRoute,
+	EbooksIndexRoute
+};
+var routeTree = Route$25._addFileChildren(rootRouteChildren)._addFileTypes();
+var getRouter = () => {
+	const queryClient = new QueryClient();
+	return createRouter({
+		routeTree,
+		context: { queryClient },
+		scrollRestoration: true,
+		defaultPreloadStaleTime: 0
+	});
+};
+//#endregion
+export { getRouter };

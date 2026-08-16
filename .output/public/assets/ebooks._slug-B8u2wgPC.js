@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-BkSabwWG.js";import{t}from"./link-ChutqWzj.js";var n=e(),r=()=>(0,n.jsxs)(`div`,{className:`p-16 text-center`,children:[(0,n.jsx)(`p`,{className:`font-display text-2xl`,children:`Ce livre n'existe pas.`}),(0,n.jsx)(t,{to:`/ebooks`,className:`mt-4 inline-block text-sm underline`,children:`Retour au catalogue`})]});export{r as notFoundComponent};
