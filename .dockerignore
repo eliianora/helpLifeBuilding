@@ -1,0 +1,9 @@
+node_modules
+.output
+.wrangler
+.tanstack
+.next
+.git
+.env.local
+.env.local.example
+*.log

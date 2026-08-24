@@ -13,6 +13,12 @@ export default defineConfig({
       strictPort: true,
     },
   },
+  // Render deploys this as a Docker/Node service, not Cloudflare Workers,
+  // so force the Nitro output to a plain Node server instead of the
+  // cloudflare-module default.
+  nitro: {
+    preset: "node-server",
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
