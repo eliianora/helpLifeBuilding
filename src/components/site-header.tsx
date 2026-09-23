@@ -80,13 +80,13 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
+          {/* <a
             href={`tel:${BRAND.phone.replace(/\s/g, "")}`}
             className="hidden items-center gap-2 text-sm font-bold text-primary xl:flex"
           >
             <Phone className="size-4" aria-hidden />
             {BRAND.phone}
-          </a>
+          </a> */}
           {loading ? null : user ? (
             <>
               {isAdmin ? (
