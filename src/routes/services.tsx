@@ -119,7 +119,7 @@ function ServicesPage() {
           ))}
         </div>
 
-        <section className="relative mt-24 bg-ink px-8 py-14 text-ink-foreground">
+        {/* <section className="relative mt-24 bg-ink px-8 py-14 text-ink-foreground">
           <h2 className="relative text-center font-display text-3xl font-extrabold uppercase tracking-tight">
             Nos garanties
           </h2>
@@ -135,7 +135,7 @@ function ServicesPage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
       </main>
 
       <SiteFooter />

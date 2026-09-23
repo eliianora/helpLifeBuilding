@@ -18,14 +18,14 @@ import {
 const MAIN_NAV = [
   { label: "Accueil", to: "/" as const },
   { label: "Ebooks", to: "/ebooks" as const },
-  { label: "Services", to: "/services" as const },
+  { label: "Services", to: "/portfolio" as const },
+  // { label: "Services", to: "/services" as const },
   { label: "Rendez-vous", to: "/rdv" as const },
+  { label: "Communauté", to: "/communaute" as const },
 ];
 
 const MORE_NAV = [
   { label: "Fondatrice", to: "/a-propos" as const },
-  { label: "Portfolio", to: "/portfolio" as const },
-  { label: "Communauté", to: "/communaute" as const },
 ];
 
 const NAV = [...MAIN_NAV, ...MORE_NAV];
@@ -62,7 +62,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-foreground transition-colors hover:text-primary">
               Plus
               <ChevronDown className="size-3.5" aria-hidden />
@@ -76,7 +76,7 @@ export function SiteHeader() {
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </nav>
 
         <div className="flex items-center gap-3">

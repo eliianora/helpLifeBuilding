@@ -202,22 +202,22 @@ var MAIN_NAV = [
 	{
 		label: "Rendez-vous",
 		to: "/rdv"
-	}
-];
-var MORE_NAV = [
-	{
-		label: "Fondatrice",
-		to: "/a-propos"
-	},
-	{
-		label: "Portfolio",
-		to: "/portfolio"
 	},
 	{
 		label: "Communauté",
 		to: "/communaute"
 	}
 ];
+// var MORE_NAV = [
+// 	{
+// 		label: "Fondatrice",
+// 		to: "/a-propos"
+// 	},
+// 	{
+// 		label: "Portfolio",
+// 		to: "/portfolio"
+// 	},
+// ];
 var NAV = [...MAIN_NAV, ...MORE_NAV];
 function SiteHeader() {
 	const { user, loading } = useSession();
